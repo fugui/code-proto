@@ -410,8 +410,8 @@ interface AppProps {
 function AppContent() {
 	return (
 		<Routes>
-			<Route path="/" element={<Navigate to="/mr" replace />} />
-			<Route path="/mr" element={<MrEventsList />} />
+			<Route path="/" element={<Navigate to="mr" replace />} />
+			<Route path="mr" element={<MrEventsList />} />
 		</Routes>
 	);
 }

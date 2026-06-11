@@ -23,5 +23,7 @@ type MrEvent struct {
 	Action         string    `gorm:"size:50" json:"action"`        // open, close, merge, update 等
 	MrURL          string    `gorm:"size:1024" json:"mr_url"`      // 跳转到 CodeArts 的页面 URL
 	Payload        string    `gorm:"type:text" json:"payload"`     // 原始 json 字符串
+	IsProtoChange  bool      `gorm:"default:false;index" json:"is_proto_change"` // 是否包含接口相关修改
+	InterfaceFiles string    `gorm:"type:text" json:"interface_files"`           // 接口相关修改的文件列表 (JSON string 数组)
 	CreatedAt      time.Time `json:"created_at"`
 }

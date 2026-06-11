@@ -20,6 +20,8 @@ interface MrEvent {
 	action: string;
 	mr_url: string;
 	payload: string;
+	is_proto_change: boolean;
+	interface_files: string;
 	created_at: string;
 }
 
@@ -35,7 +37,7 @@ function MrEventsList() {
 	const [loading, setLoading] = useState(false);
 
 	// Modal detail view state
-	const [viewingPayload, setViewingPayload] = useState<string | null>(null);
+	const [viewingEvent, setViewingEvent] = React.useState<MrEvent | null>(null);
 
 	const fetchEvents = useCallback(() => {
 		setLoading(true);
@@ -239,6 +241,7 @@ function MrEventsList() {
 								<th style={{ width: '60px' }}>序号</th>
 								<th style={{ width: '180px' }}>代码仓</th>
 								<th>Merge Request 推送标题</th>
+								<th style={{ width: '100px' }}>接口变更</th>
 								<th style={{ width: '130px' }}>源分支</th>
 								<th style={{ width: '130px' }}>目标分支</th>
 								<th style={{ width: '100px' }}>推送者</th>
@@ -250,7 +253,7 @@ function MrEventsList() {
 						<tbody>
 							{items.length === 0 ? (
 								<tr>
-									<td colSpan={9} style={{ textAlign: 'center', padding: '4rem', color: '#94a3b8' }}>
+									<td colSpan={10} style={{ textAlign: 'center', padding: '4rem', color: '#94a3b8' }}>
 										暂无华为 CodeArts MR 推送事件记录。
 									</td>
 								</tr>
@@ -297,6 +300,66 @@ function MrEventsList() {
 											)}
 										</td>
 										<td>
+											<div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem', alignItems: 'flex-start' }}>
+												{item.is_proto_change ? (
+													<span style={{ 
+														display: 'inline-flex', 
+														alignItems: 'center', 
+														padding: '0.15rem 0.5rem', 
+														borderRadius: '4px', 
+														fontSize: '0.72rem', 
+														fontWeight: 700, 
+														backgroundColor: 'rgba(16, 185, 129, 0.15)', 
+														color: '#10b981',
+														border: '1px solid rgba(16, 185, 129, 0.3)',
+														boxShadow: '0 0 8px rgba(16, 185, 129, 0.1)'
+													}}>
+														接口变更
+													</span>
+												) : (
+													<span style={{ 
+														display: 'inline-flex', 
+														alignItems: 'center', 
+														padding: '0.15rem 0.5rem', 
+														borderRadius: '4px', 
+														fontSize: '0.72rem', 
+														fontWeight: 500, 
+														backgroundColor: 'rgba(255, 255, 255, 0.03)', 
+														color: 'var(--text-secondary)',
+														border: '1px solid var(--border-color)'
+													}}>
+														普通
+													</span>
+												)}
+												{item.is_proto_change && item.interface_files && (() => {
+													try {
+														const files = JSON.parse(item.interface_files);
+														if (files && files.length > 0) {
+															return (
+																<div 
+																	style={{ 
+																		fontSize: '0.68rem', 
+																		color: '#10b981', 
+																		opacity: 0.85, 
+																		fontFamily: 'monospace', 
+																		maxWidth: '120px', 
+																		overflow: 'hidden', 
+																		textOverflow: 'ellipsis', 
+																		whiteSpace: 'nowrap',
+																		cursor: 'help'
+																	}} 
+																	title={`接口相关变更文件：\n${files.join('\n')}`}
+																>
+																	{files.length === 1 ? files[0] : `${files[0]} 等 ${files.length} 个文件`}
+																</div>
+															);
+														}
+													} catch (e) {}
+													return null;
+												})()}
+											</div>
+										</td>
+										<td>
 											<span style={{ fontFamily: 'monospace', background: 'var(--bg-color)', padding: '0.15rem 0.4rem', borderRadius: '4px', border: '1px solid var(--border-color)', fontSize: '0.78rem' }}>{item.source_branch}</span>
 										</td>
 										<td>
@@ -313,7 +376,7 @@ function MrEventsList() {
 										</td>
 										<td>
 											<button
-												onClick={() => setViewingPayload(item.payload)}
+												onClick={() => setViewingEvent(item)}
 												style={{
 													background: 'transparent',
 													border: 'none',
@@ -379,21 +442,48 @@ function MrEventsList() {
 			)}
 
 			{/* Modal Detail Payload View */}
-			{viewingPayload !== null && (
+			{viewingEvent !== null && (
 				<div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-					<div style={{ width: '650px', maxWidth: '90vw', maxHeight: '80vh', display: 'flex', flexDirection: 'column', background: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: '12px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
+					<div style={{ width: '750px', maxWidth: '90vw', maxHeight: '80vh', display: 'flex', flexDirection: 'column', background: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: '12px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
 						<div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 							<h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600, color: 'var(--text-color)' }}>原始 Webhook JSON Payload</h3>
 							<button
-								onClick={() => setViewingPayload(null)}
+								onClick={() => setViewingEvent(null)}
 								style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
 							>
 								<CloseIcon />
 							</button>
 						</div>
 						<div style={{ flex: 1, overflow: 'auto', padding: '1.5rem', background: '#0f172a' }}>
+							{viewingEvent.is_proto_change && viewingEvent.interface_files && (() => {
+								try {
+									const files = JSON.parse(viewingEvent.interface_files);
+									if (files && files.length > 0) {
+										return (
+											<div style={{ 
+												marginBottom: '1.25rem', 
+												padding: '0.85rem 1rem', 
+												borderRadius: '8px', 
+												background: 'rgba(16, 185, 129, 0.08)', 
+												border: '1px solid rgba(16, 185, 129, 0.2)',
+												color: '#10b981',
+												fontSize: '0.825rem',
+												textAlign: 'left'
+											}}>
+												<strong style={{ display: 'block', marginBottom: '0.45rem', color: '#10b981', fontSize: '0.85rem' }}>⚡ 接口相关变更文件：</strong>
+												<div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontFamily: 'monospace', fontSize: '0.76rem' }}>
+													{files.map((f: string, idx: number) => (
+														<div key={idx} style={{ paddingLeft: '0.5rem', borderLeft: '2px solid #10b981' }}>{f}</div>
+													))}
+												</div>
+											</div>
+										);
+									}
+								} catch(e) {}
+								return null;
+							})()}
 							<pre style={{ margin: 0, color: '#38bdf8', fontSize: '0.8rem', fontFamily: "monospace", textAlign: 'left', lineHeight: 1.4 }}>
-								<code>{formatPayload(viewingPayload)}</code>
+								<code>{formatPayload(viewingEvent.payload)}</code>
 							</pre>
 						</div>
 					</div>

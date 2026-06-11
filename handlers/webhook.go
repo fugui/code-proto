@@ -6,10 +6,16 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
+
+type CodeChange struct {
+	OldPath string `json:"old_path"`
+	NewPath string `json:"new_path"`
+}
 
 type WebhookPayload struct {
 	ObjectKind string `json:"object_kind"`
@@ -27,14 +33,16 @@ type WebhookPayload struct {
 		Username string `json:"username"`
 	} `json:"user"`
 	ObjectAttributes struct {
-		Id           int64  `json:"id"`
-		Iid          int64  `json:"iid"`
-		Title        string `json:"title"`
-		SourceBranch string `json:"source_branch"`
-		TargetBranch string `json:"target_branch"`
-		Action       string `json:"action"`
-		Url          string `json:"url"`
+		Id           int64        `json:"id"`
+		Iid          int64        `json:"iid"`
+		Title        string       `json:"title"`
+		SourceBranch string       `json:"source_branch"`
+		TargetBranch string       `json:"target_branch"`
+		Action       string       `json:"action"`
+		Url          string       `json:"url"`
+		CodeChanges  []CodeChange `json:"code_changes"`
 	} `json:"object_attributes"`
+	CodeChanges []CodeChange `json:"code_changes"`
 }
 
 func HandleWebhook(c *gin.Context) {
@@ -95,20 +103,60 @@ func HandleWebhook(c *gin.Context) {
 		action = "push" // Default fallback
 	}
 
-	// 5. Store Event in SQLite
+	// 5. Determine if it is an interface change (.proto or containing "pg/") and collect files
+	allChanges := append([]CodeChange{}, payload.CodeChanges...)
+	if payload.ObjectAttributes.CodeChanges != nil {
+		allChanges = append(allChanges, payload.ObjectAttributes.CodeChanges...)
+	}
+
+	var protoFiles []string
+	isProtoChange := false
+	for _, change := range allChanges {
+		filePath := change.NewPath
+		if filePath == "" {
+			filePath = change.OldPath
+		}
+		if filePath != "" {
+			if strings.HasSuffix(filePath, ".proto") || strings.Contains(filePath, "pg/") {
+				isProtoChange = true
+				// Check for duplicates
+				exists := false
+				for _, f := range protoFiles {
+					if f == filePath {
+						exists = true
+						break
+					}
+				}
+				if !exists {
+					protoFiles = append(protoFiles, filePath)
+				}
+			}
+		}
+	}
+
+	protoFilesJSON := "[]"
+	if len(protoFiles) > 0 {
+		if jBytes, errMarshal := json.Marshal(protoFiles); errMarshal == nil {
+			protoFilesJSON = string(jBytes)
+		}
+	}
+
+	// 6. Store Event in SQLite
 	event := models.MrEvent{
-		MrID:         payload.ObjectAttributes.Id,
-		MrNum:        payload.ObjectAttributes.Iid,
-		RepoName:     repoName,
-		RepoURL:      repoURL,
-		Title:        payload.ObjectAttributes.Title,
-		SourceBranch: payload.ObjectAttributes.SourceBranch,
-		TargetBranch: payload.ObjectAttributes.TargetBranch,
-		Author:       authorName,
-		Action:       action,
-		MrURL:        payload.ObjectAttributes.Url,
-		Payload:      rawJSON,
-		CreatedAt:    time.Now(),
+		MrID:           payload.ObjectAttributes.Id,
+		MrNum:          payload.ObjectAttributes.Iid,
+		RepoName:       repoName,
+		RepoURL:        repoURL,
+		Title:          payload.ObjectAttributes.Title,
+		SourceBranch:   payload.ObjectAttributes.SourceBranch,
+		TargetBranch:   payload.ObjectAttributes.TargetBranch,
+		Author:         authorName,
+		Action:         action,
+		MrURL:          payload.ObjectAttributes.Url,
+		Payload:        rawJSON,
+		IsProtoChange:  isProtoChange,
+		InterfaceFiles: protoFilesJSON,
+		CreatedAt:      time.Now(),
 	}
 
 	if errSave := models.DB.Create(&event).Error; errSave != nil {

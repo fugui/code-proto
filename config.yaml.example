@@ -1,0 +1,21 @@
+# Code-Proto 子系统配置文件模板
+
+server:
+  # 服务监听地址及端口，默认运行在 8081
+  port: ":8081"
+  # 是否启用 Gin 的控制台日志输出
+  gin_log: true
+  # 超时控制选项
+  read_timeout: 15s
+  read_header_timeout: 10s
+  write_timeout: 15s
+  idle_timeout: 60s
+  max_header_bytes: 1048576 # 1MB (1024 * 1024)
+
+auth:
+  # 统一鉴权 JWT 共享密钥（必须与 code-bench/config.yaml 里的 auth.jwt_secret 保持一致以实现单点认证）
+  jwt_secret: "YOUR_SHARED_JWT_SECRET_HERE"
+
+database:
+  # SQLite 数据库的本地存放路径
+  db_path: "code_proto.db"

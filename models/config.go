@@ -1,11 +1,51 @@
 package models
 
 import (
+	"fmt"
 	"os"
 	"time"
 
 	"gopkg.in/yaml.v3"
 )
+
+type DatabaseConfig struct {
+	Host         string `yaml:"host"`
+	Port         int    `yaml:"port"`
+	User         string `yaml:"user"`
+	Password     string `yaml:"password"`
+	DBName       string `yaml:"dbname"`
+	SSLMode      string `yaml:"sslmode"`
+	MaxOpenConns int    `yaml:"max_open_conns"`
+	MaxIdleConns int    `yaml:"max_idle_conns"`
+}
+
+func (d *DatabaseConfig) GetDSN() string {
+	if envDSN := os.Getenv("DB_DSN"); envDSN != "" {
+		return envDSN
+	}
+	host := d.Host
+	if host == "" {
+		host = "127.0.0.1"
+	}
+	port := d.Port
+	if port == 0 {
+		port = 5432
+	}
+	user := d.User
+	if user == "" {
+		user = "postgres"
+	}
+	dbname := d.DBName
+	if dbname == "" {
+		dbname = "code_shield"
+	}
+	sslmode := d.SSLMode
+	if sslmode == "" {
+		sslmode = "disable"
+	}
+	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		host, port, user, d.Password, dbname, sslmode)
+}
 
 type Config struct {
 	Server struct {
@@ -20,9 +60,7 @@ type Config struct {
 	Auth struct {
 		JWTSecret string `yaml:"jwt_secret"`
 	} `yaml:"auth"`
-	Database struct {
-		DbPath string `yaml:"db_path"`
-	} `yaml:"database"`
+	Database DatabaseConfig `yaml:"database"`
 }
 
 var AppConfig Config
@@ -64,8 +102,5 @@ func applyDefaults() {
 	}
 	if AppConfig.Auth.JWTSecret == "" {
 		AppConfig.Auth.JWTSecret = "ABCDEFGHIJKLMNOPQRSTVUWXYZ0987654321"
-	}
-	if AppConfig.Database.DbPath == "" {
-		AppConfig.Database.DbPath = "code_proto.db"
 	}
 }

@@ -3,7 +3,7 @@ package models
 import (
 	"log"
 
-	"github.com/glebarez/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -11,9 +11,16 @@ var DB *gorm.DB
 
 func InitDB() {
 	var err error
-	DB, err = gorm.Open(sqlite.Open(AppConfig.Database.DbPath), &gorm.Config{})
+	dsn := AppConfig.Database.GetDSN()
+	log.Printf("[Database] Connecting to PostgreSQL database (%s)...", AppConfig.Database.DBName)
+	dialector := postgres.New(postgres.Config{
+		DSN:                  dsn,
+		PreferSimpleProtocol: true,
+	})
+
+	DB, err = gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
-		log.Fatalf("Failed to open sqlite database %s: %v", AppConfig.Database.DbPath, err)
+		log.Fatalf("[Database] Failed to connect database: %v", err)
 	}
 
 	// Auto migrate schemas
@@ -25,5 +32,5 @@ func InitDB() {
 		log.Fatalf("Failed to auto-migrate database schemas: %v", err)
 	}
 
-	log.Printf("[Database] Database initialized and auto-migrated at path: %s", AppConfig.Database.DbPath)
+	log.Println("[Database] Database initialized and auto-migrated successfully")
 }

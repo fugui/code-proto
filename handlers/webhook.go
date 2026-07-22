@@ -141,7 +141,7 @@ func HandleWebhook(c *gin.Context) {
 		}
 	}
 
-	// 6. Store Event in SQLite
+	// 6. Store Event in Database
 	event := models.MrEvent{
 		MrID:           payload.ObjectAttributes.Id,
 		MrNum:          payload.ObjectAttributes.Iid,

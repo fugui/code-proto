@@ -17,5 +17,9 @@ auth:
   jwt_secret: "YOUR_SHARED_JWT_SECRET_HERE"
 
 database:
-  # SQLite 数据库的本地存放路径
-  db_path: "code_proto.db"
+  host: "127.0.0.1"
+  port: 5432
+  user: "postgres"
+  password: "YOUR_POSTGRES_PASSWORD"
+  dbname: "code_shield"
+  sslmode: "disable"

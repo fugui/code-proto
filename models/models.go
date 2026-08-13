@@ -1,14 +1,11 @@
 package models
 
-import "time"
+import (
+	commonModels "code-common/backend/models"
+	"time"
+)
 
-type User struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
-	Email     string    `gorm:"uniqueIndex" json:"email"`
-	Name      string    `json:"name"`
-	IsAdmin   bool      `json:"is_admin"`
-	CreatedAt time.Time `json:"created_at"`
-}
+type User = commonModels.User
 
 type MrEvent struct {
 	ID             uint      `gorm:"primaryKey" json:"id"`

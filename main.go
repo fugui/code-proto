@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	commonAuth "code-common/backend/auth"
 	"code-proto/handlers"
 	"code-proto/models"
 
@@ -40,6 +41,11 @@ func main() {
 
 	// 2. Initialize Database
 	models.InitDB()
+
+	// 确保至少存在默认管理员账号
+	if err := commonAuth.EnsureSeedAdmin(models.DB, "proto_admin"); err != nil {
+		log.Printf("[Proto] Warning: Failed to ensure seed admin: %v", err)
+	}
 
 	// 3. Initialize Gin engine
 	gin.SetMode(gin.ReleaseMode)

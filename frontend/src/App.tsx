@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
+import { Pagination, usePagination } from '@code/common';
 
 // Simple Icons as SVGs for lightweight design
 const RefreshIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>;
@@ -27,7 +28,7 @@ interface MrEvent {
 
 function MrEventsList() {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const page = parseInt(searchParams.get('page') || '1', 10) || 1;
+	const { page, pageSize } = usePagination({ defaultPageSize: 15 });
 	const repoFilter = searchParams.get('repo') || '';
 	const authorFilter = searchParams.get('author') || '';
 
@@ -85,18 +86,6 @@ function MrEventsList() {
 				next.delete(key);
 			}
 			next.delete('page');
-			return next;
-		}, { replace: true });
-	};
-
-	const setPage = (p: number) => {
-		setSearchParams(prev => {
-			const next = new URLSearchParams(prev);
-			if (p <= 1) {
-				next.delete('page');
-			} else {
-				next.set('page', p.toString());
-			}
 			return next;
 		}, { replace: true });
 	};
@@ -405,40 +394,8 @@ function MrEventsList() {
 			</div>
 
 			{/* Pagination Footer */}
-			{totalPages > 1 && (
-				<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem', padding: '0.5rem', background: 'var(--card-bg)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-					<span style={{ fontSize: '0.85rem', color: 'var(--text-color)' }}>
-						当前第 {page} / {totalPages} 页
-					</span>
-					<div style={{ display: 'flex', gap: '0.5rem' }}>
-						<button
-							disabled={page === 1}
-							onClick={() => setPage(page - 1)}
-							style={{
-								padding: '0.35rem 0.75rem', borderRadius: '4px', border: '1px solid var(--border-color)',
-								background: page === 1 ? 'var(--bg-color)' : 'var(--card-bg)',
-								color: page === 1 ? '#94a3b8' : 'var(--text-color)',
-								cursor: page === 1 ? 'not-allowed' : 'pointer',
-								fontSize: '0.825rem'
-							}}
-						>
-							上一页
-						</button>
-						<button
-							disabled={page >= totalPages}
-							onClick={() => setPage(page + 1)}
-							style={{
-								padding: '0.35rem 0.75rem', borderRadius: '4px', border: '1px solid var(--border-color)',
-								background: page >= totalPages ? 'var(--bg-color)' : 'var(--card-bg)',
-								color: page >= totalPages ? '#94a3b8' : 'var(--text-color)',
-								cursor: page >= totalPages ? 'not-allowed' : 'pointer',
-								fontSize: '0.825rem'
-							}}
-						>
-							下一页
-						</button>
-					</div>
-				</div>
+			{totalItems > 0 && (
+				<Pagination totalItems={totalItems} defaultPageSize={15} />
 			)}
 
 			{/* Modal Detail Payload View */}

@@ -91,27 +91,27 @@ function MrEventsList() {
 	};
 
 	const getActionBadgeStyle = (action: string) => {
-		let bg = 'rgba(100, 116, 139, 0.1)';
-		let color = '#64748b';
+		let bg = 'var(--color-bg-muted)';
+		let color = 'var(--color-text-secondary)';
 		const act = action.toLowerCase();
 		if (act === 'open' || act === 'create') {
-			bg = 'rgba(59, 130, 246, 0.12)';
-			color = '#3b82f6';
+			bg = 'var(--color-primary-subtle)';
+			color = 'var(--color-primary)';
 		} else if (act === 'merge' || act === 'merged') {
-			bg = 'rgba(16, 185, 129, 0.12)';
-			color = '#10b981';
+			bg = 'var(--color-success-subtle)';
+			color = 'var(--color-success)';
 		} else if (act === 'close' || act === 'closed') {
-			bg = 'rgba(239, 68, 68, 0.12)';
-			color = '#ef4444';
+			bg = 'var(--color-danger-subtle)';
+			color = 'var(--color-danger)';
 		} else if (act === 'update' || act === 'updated') {
-			bg = 'rgba(245, 158, 11, 0.12)';
-			color = '#f59e0b';
+			bg = 'var(--color-warning-subtle)';
+			color = 'var(--color-warning)';
 		}
 		return {
 			display: 'inline-flex',
 			alignItems: 'center',
 			padding: '0.15rem 0.5rem',
-			borderRadius: '4px',
+			borderRadius: 'var(--radius-xs, 4px)',
 			fontSize: '0.75rem',
 			fontWeight: 600,
 			backgroundColor: bg,
@@ -129,29 +129,29 @@ function MrEventsList() {
 	};
 
 	return (
-		<div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', fontFamily: "'Outfit', 'Inter', sans-serif" }}>
+		<div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', fontFamily: "var(--font-family-sans)" }}>
 			
 			{/* Top bar with stats & filters */}
-			<div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', background: 'var(--card-bg)', padding: '1.25rem', borderRadius: '10px', border: '1px solid var(--border-color)', alignItems: 'center', justifyContent: 'space-between' }}>
+			<div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', background: 'var(--card-bg)', padding: '1.25rem', borderRadius: 'var(--radius-lg, 10px)', border: '1px solid var(--border-color)', alignItems: 'center', justifyContent: 'space-between' }}>
 				<div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
 					<div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', minWidth: '160px' }}>
-						<label style={{ fontSize: '0.72rem', fontWeight: 600, color: '#64748b' }}>代码仓过滤</label>
+						<label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-secondary)' }}>代码仓过滤</label>
 						<input
 							type="text"
 							placeholder="输入代码仓..."
 							value={repoFilter}
 							onChange={e => handleFilterChange('repo', e.target.value)}
-							style={{ padding: '0.45rem 0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', outline: 'none', fontSize: '0.85rem', background: 'var(--bg-color)', color: 'var(--text-color)' }}
+							style={{ padding: '0.45rem 0.75rem', borderRadius: 'var(--radius-sm, 6px)', border: '1px solid var(--border-color)', outline: 'none', fontSize: '0.85rem', background: 'var(--bg-color)', color: 'var(--text-color)' }}
 						/>
 					</div>
 					<div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', minWidth: '160px' }}>
-						<label style={{ fontSize: '0.72rem', fontWeight: 600, color: '#64748b' }}>提交人过滤</label>
+						<label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-secondary)' }}>提交人过滤</label>
 						<input
 							type="text"
 							placeholder="按责任人/作者..."
 							value={authorFilter}
 							onChange={e => handleFilterChange('author', e.target.value)}
-							style={{ padding: '0.45rem 0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', outline: 'none', fontSize: '0.85rem', background: 'var(--bg-color)', color: 'var(--text-color)' }}
+							style={{ padding: '0.45rem 0.75rem', borderRadius: 'var(--radius-sm, 6px)', border: '1px solid var(--border-color)', outline: 'none', fontSize: '0.85rem', background: 'var(--bg-color)', color: 'var(--text-color)' }}
 						/>
 					</div>
 					{(repoFilter || authorFilter) && (
@@ -161,9 +161,9 @@ function MrEventsList() {
 								background: 'transparent',
 								border: '1px solid var(--border-color)',
 								padding: '0.45rem 1rem',
-								borderRadius: '6px',
+								borderRadius: 'var(--radius-sm, 6px)',
 								fontSize: '0.85rem',
-								color: '#64748b',
+								color: 'var(--text-secondary)',
 								cursor: 'pointer',
 								marginTop: '1.1rem',
 								display: 'inline-flex',
@@ -177,7 +177,7 @@ function MrEventsList() {
 							}}
 							onMouseLeave={e => {
 								e.currentTarget.style.borderColor = 'var(--border-color)';
-								e.currentTarget.style.color = '#64748b';
+								e.currentTarget.style.color = 'var(--text-secondary)';
 							}}
 						>
 							<RefreshIcon />
@@ -187,17 +187,17 @@ function MrEventsList() {
 				</div>
 
 				<div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-					<span style={{ fontSize: '0.85rem', color: '#64748b' }}>
+					<span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
 						共计收到 <strong>{totalItems}</strong> 个推送事件
 					</span>
 					<button
 						onClick={fetchEvents}
 						style={{
 							background: 'var(--primary-color)',
-							color: 'white',
+							color: 'var(--color-text-white, #ffffff)',
 							border: 'none',
 							padding: '0.5rem 1rem',
-							borderRadius: '6px',
+							borderRadius: 'var(--radius-sm, 6px)',
 							fontSize: '0.85rem',
 							fontWeight: 600,
 							cursor: 'pointer',
@@ -218,8 +218,8 @@ function MrEventsList() {
 			{/* Main Table Card */}
 			<div className="card" style={{ padding: 0, fontSize: '0.875rem', overflow: 'hidden' }}>
 				{loading ? (
-					<div style={{ padding: '6rem', textAlign: 'center', color: '#64748b' }}>
-						<div style={{ width: '32px', height: '32px', borderRadius: '50%', border: '2px solid rgba(59,130,246,0.15)', borderTopColor: 'var(--primary-color)', animation: 'spin 0.8s linear infinite', margin: '0 auto 1rem' }} />
+					<div style={{ padding: '6rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+						<div style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-full, 50%)', border: '2px solid var(--color-primary-subtle)', borderTopColor: 'var(--primary-color)', animation: 'spin 0.8s linear infinite', margin: '0 auto 1rem' }} />
 						数据加载中，请稍候...
 						<style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 					</div>
@@ -242,14 +242,14 @@ function MrEventsList() {
 						<tbody>
 							{items.length === 0 ? (
 								<tr>
-									<td colSpan={10} style={{ textAlign: 'center', padding: '4rem', color: '#94a3b8' }}>
+									<td colSpan={10} style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-secondary)' }}>
 										暂无华为 CodeArts MR 推送事件记录。
 									</td>
 								</tr>
 							) : (
 								items.map((item, idx) => (
 									<tr key={item.id}>
-										<td style={{ color: '#94a3b8', fontWeight: 500 }}>
+										<td style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>
 											#{(page - 1) * 15 + idx + 1}
 										</td>
 										<td style={{ fontWeight: 500 }}>
@@ -295,13 +295,13 @@ function MrEventsList() {
 														display: 'inline-flex', 
 														alignItems: 'center', 
 														padding: '0.15rem 0.5rem', 
-														borderRadius: '4px', 
+														borderRadius: 'var(--radius-xs, 4px)', 
 														fontSize: '0.72rem', 
 														fontWeight: 700, 
-														backgroundColor: 'rgba(16, 185, 129, 0.15)', 
-														color: '#10b981',
-														border: '1px solid rgba(16, 185, 129, 0.3)',
-														boxShadow: '0 0 8px rgba(16, 185, 129, 0.1)'
+														backgroundColor: 'var(--color-success-subtle)', 
+														color: 'var(--color-success)',
+														border: '1px solid var(--color-success-border)',
+														boxShadow: '0 0 8px var(--color-success-subtle)'
 													}}>
 														接口变更
 													</span>
@@ -310,10 +310,10 @@ function MrEventsList() {
 														display: 'inline-flex', 
 														alignItems: 'center', 
 														padding: '0.15rem 0.5rem', 
-														borderRadius: '4px', 
+														borderRadius: 'var(--radius-xs, 4px)', 
 														fontSize: '0.72rem', 
 														fontWeight: 500, 
-														backgroundColor: 'rgba(255, 255, 255, 0.03)', 
+														backgroundColor: 'var(--color-bg-muted)', 
 														color: 'var(--text-secondary)',
 														border: '1px solid var(--border-color)'
 													}}>
@@ -328,9 +328,9 @@ function MrEventsList() {
 																<div 
 																	style={{ 
 																		fontSize: '0.68rem', 
-																		color: '#10b981', 
+																		color: 'var(--color-success)', 
 																		opacity: 0.85, 
-																		fontFamily: 'monospace', 
+																		fontFamily: 'var(--font-family-mono)', 
 																		maxWidth: '120px', 
 																		overflow: 'hidden', 
 																		textOverflow: 'ellipsis', 
@@ -349,10 +349,10 @@ function MrEventsList() {
 											</div>
 										</td>
 										<td>
-											<span style={{ fontFamily: 'monospace', background: 'var(--bg-color)', padding: '0.15rem 0.4rem', borderRadius: '4px', border: '1px solid var(--border-color)', fontSize: '0.78rem' }}>{item.source_branch}</span>
+											<span style={{ fontFamily: 'var(--font-family-mono)', background: 'var(--bg-color)', padding: '0.15rem 0.4rem', borderRadius: 'var(--radius-xs, 4px)', border: '1px solid var(--border-color)', fontSize: '0.78rem' }}>{item.source_branch}</span>
 										</td>
 										<td>
-											<span style={{ fontFamily: 'monospace', background: 'var(--bg-color)', padding: '0.15rem 0.4rem', borderRadius: '4px', border: '1px solid var(--border-color)', fontSize: '0.78rem' }}>{item.target_branch}</span>
+											<span style={{ fontFamily: 'var(--font-family-mono)', background: 'var(--bg-color)', padding: '0.15rem 0.4rem', borderRadius: 'var(--radius-xs, 4px)', border: '1px solid var(--border-color)', fontSize: '0.78rem' }}>{item.target_branch}</span>
 										</td>
 										<td>{item.author}</td>
 										<td>
@@ -360,7 +360,7 @@ function MrEventsList() {
 												{item.action.toUpperCase()}
 											</span>
 										</td>
-										<td style={{ color: '#64748b' }}>
+										<td style={{ color: 'var(--text-secondary)' }}>
 											{item.created_at ? item.created_at.replace('T', ' ').substring(0, 19) : '-'}
 										</td>
 										<td>
@@ -371,7 +371,7 @@ function MrEventsList() {
 													border: 'none',
 													cursor: 'pointer',
 													padding: '0.35rem',
-													borderRadius: '4px',
+													borderRadius: 'var(--radius-xs, 4px)',
 													color: 'var(--primary-color)',
 													display: 'flex',
 													alignItems: 'center',
@@ -379,7 +379,7 @@ function MrEventsList() {
 													transition: 'background-color 0.2s'
 												}}
 												title="查看原始 JSON"
-												onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.08)'}
+												onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--color-primary-subtle)'}
 												onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
 											>
 												<CodeIcon />
@@ -400,18 +400,18 @@ function MrEventsList() {
 
 			{/* Modal Detail Payload View */}
 			{viewingEvent !== null && (
-				<div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-					<div style={{ width: '750px', maxWidth: '90vw', maxHeight: '80vh', display: 'flex', flexDirection: 'column', background: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: '12px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
+				<div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'var(--color-bg-overlay)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+					<div style={{ width: '750px', maxWidth: '90vw', maxHeight: '80vh', display: 'flex', flexDirection: 'column', background: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg, 12px)', boxShadow: 'var(--shadow-lg)', overflow: 'hidden' }}>
 						<div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 							<h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600, color: 'var(--text-color)' }}>原始 Webhook JSON Payload</h3>
 							<button
 								onClick={() => setViewingEvent(null)}
-								style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+								style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
 							>
 								<CloseIcon />
 							</button>
 						</div>
-						<div style={{ flex: 1, overflow: 'auto', padding: '1.5rem', background: '#0f172a' }}>
+						<div style={{ flex: 1, overflow: 'auto', padding: '1.5rem', background: 'var(--color-bg-app)' }}>
 							{viewingEvent.is_proto_change && viewingEvent.interface_files && (() => {
 								try {
 									const files = JSON.parse(viewingEvent.interface_files);
@@ -420,17 +420,17 @@ function MrEventsList() {
 											<div style={{ 
 												marginBottom: '1.25rem', 
 												padding: '0.85rem 1rem', 
-												borderRadius: '8px', 
-												background: 'rgba(16, 185, 129, 0.08)', 
-												border: '1px solid rgba(16, 185, 129, 0.2)',
-												color: '#10b981',
+												borderRadius: 'var(--radius-md, 8px)', 
+												background: 'var(--color-success-subtle)', 
+												border: '1px solid var(--color-success-border)', 
+												color: 'var(--color-success)',
 												fontSize: '0.825rem',
 												textAlign: 'left'
 											}}>
-												<strong style={{ display: 'block', marginBottom: '0.45rem', color: '#10b981', fontSize: '0.85rem' }}>⚡ 接口相关变更文件：</strong>
-												<div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontFamily: 'monospace', fontSize: '0.76rem' }}>
+												<strong style={{ display: 'block', marginBottom: '0.45rem', color: 'var(--color-success)', fontSize: '0.85rem' }}>⚡ 接口相关变更文件：</strong>
+												<div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontFamily: 'var(--font-family-mono)', fontSize: '0.76rem' }}>
 													{files.map((f: string, idx: number) => (
-														<div key={idx} style={{ paddingLeft: '0.5rem', borderLeft: '2px solid #10b981' }}>{f}</div>
+														<div key={idx} style={{ paddingLeft: '0.5rem', borderLeft: '2px solid var(--color-success)' }}>{f}</div>
 													))}
 												</div>
 											</div>
@@ -439,7 +439,7 @@ function MrEventsList() {
 								} catch(e) {}
 								return null;
 							})()}
-							<pre style={{ margin: 0, color: '#38bdf8', fontSize: '0.8rem', fontFamily: "monospace", textAlign: 'left', lineHeight: 1.4 }}>
+							<pre style={{ margin: 0, color: 'var(--color-info)', fontSize: '0.8rem', fontFamily: "var(--font-family-mono)", textAlign: 'left', lineHeight: 1.4 }}>
 								<code>{formatPayload(viewingEvent.payload)}</code>
 							</pre>
 						</div>

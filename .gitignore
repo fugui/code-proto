@@ -7,6 +7,8 @@ node_modules/
 dist/
 build/
 frontend/dist/
+frontend/public/version.json
+public/version.json
 
 # Logs
 logs/

@@ -6,10 +6,10 @@ server:
   # 是否启用 Gin 的控制台日志输出
   gin_log: true
   # 超时控制选项
-  read_timeout: 15s
+  read_timeout: 120s
   read_header_timeout: 10s
-  write_timeout: 15s
-  idle_timeout: 60s
+  write_timeout: 120s
+  idle_timeout: 180s
   max_header_bytes: 1048576 # 1MB (1024 * 1024)
 
 auth:

@@ -49,16 +49,16 @@ func applyDefaults() {
 		AppConfig.Server.Port = ":8081"
 	}
 	if AppConfig.Server.ReadTimeout == 0 {
-		AppConfig.Server.ReadTimeout = 15 * time.Second
+		AppConfig.Server.ReadTimeout = 120 * time.Second
 	}
 	if AppConfig.Server.ReadHeaderTimeout == 0 {
 		AppConfig.Server.ReadHeaderTimeout = 10 * time.Second
 	}
 	if AppConfig.Server.WriteTimeout == 0 {
-		AppConfig.Server.WriteTimeout = 15 * time.Second
+		AppConfig.Server.WriteTimeout = 120 * time.Second
 	}
 	if AppConfig.Server.IdleTimeout == 0 {
-		AppConfig.Server.IdleTimeout = 60 * time.Second
+		AppConfig.Server.IdleTimeout = 180 * time.Second
 	}
 	if AppConfig.Server.MaxHeaderBytes == 0 {
 		AppConfig.Server.MaxHeaderBytes = 1 << 20 // 1MB

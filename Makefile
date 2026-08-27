@@ -1,19 +1,45 @@
-.PHONY: all build clean frontend backend run
+BINARY          := code-proto-server
+FRONTEND_DIR    := frontend
+DIST_DIR        := $(FRONTEND_DIR)/dist
+NODE_MODULES    := $(FRONTEND_DIR)/node_modules
 
+# 自动收集前端与后端源码依赖
+FRONTEND_SRCS   := $(shell find $(FRONTEND_DIR) -type f -not -path "*/node_modules/*" -not -path "*/dist/*" 2>/dev/null)
+BACKEND_SRCS    := $(shell find . -type f \( -name "*.go" -o -name "go.mod" -o -name "go.sum" \) -not -path "*/$(FRONTEND_DIR)/*" -not -path "*/.git/*")
+
+.PHONY: all build install frontend backend clean run
+
+# 默认运行目标
 all: build
 
-build: frontend backend
+# 完整打包构建
+build: $(BINARY)
 
-clean:
-	rm -rf code-proto-server frontend/dist
+# 依赖安装 (node_modules)
+install: $(NODE_MODULES)
 
-frontend:
-	cd frontend && ( [ -d node_modules ] || npm install )
-	cd frontend && npm run build
+$(NODE_MODULES): $(FRONTEND_DIR)/package.json
+	cd $(FRONTEND_DIR) && ( [ -d node_modules ] || npm install )
+	@touch $(NODE_MODULES)
 
-backend:
+# 编译构建前端静态资产 (dist/)
+frontend: $(DIST_DIR)
+
+$(DIST_DIR): $(NODE_MODULES) $(FRONTEND_SRCS)
+	cd $(FRONTEND_DIR) && npm run build
+	@touch $(DIST_DIR)
+
+# 编译后端可执行文件
+backend: $(BINARY)
+
+$(BINARY): $(BACKEND_SRCS) $(DIST_DIR)
 	go mod download
-	go build -o code-proto-server
+	go build -o $(BINARY)
 
+# 清理构建产物
+clean:
+	rm -rf $(DIST_DIR) $(BINARY)
+
+# 快捷启动命令
 run: build
-	./code-proto-server
+	./$(BINARY)

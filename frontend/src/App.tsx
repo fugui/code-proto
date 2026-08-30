@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
-import { Pagination, usePagination } from '@code/common';
+import { Modal, Pagination, usePagination } from '@code/common';
 
 // Simple Icons as SVGs for lightweight design
 const RefreshIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>;
 const ExternalLinkIcon = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>;
 const CodeIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>;
-const CloseIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
 
 interface MrEvent {
 	id: number;
@@ -399,53 +398,54 @@ function MrEventsList() {
 			)}
 
 			{/* Modal Detail Payload View */}
-			{viewingEvent !== null && (
-				<div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'var(--color-bg-overlay)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-					<div style={{ width: '750px', maxWidth: '90vw', maxHeight: '80vh', display: 'flex', flexDirection: 'column', background: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg, 12px)', boxShadow: 'var(--shadow-lg)', overflow: 'hidden' }}>
-						<div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-							<h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600, color: 'var(--text-color)' }}>原始 Webhook JSON Payload</h3>
-							<button
-								onClick={() => setViewingEvent(null)}
-								style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-							>
-								<CloseIcon />
-							</button>
-						</div>
-						<div style={{ flex: 1, overflow: 'auto', padding: '1.5rem', background: 'var(--color-bg-app)' }}>
-							{viewingEvent.is_proto_change && viewingEvent.interface_files && (() => {
-								try {
-									const files = JSON.parse(viewingEvent.interface_files);
-									if (files && files.length > 0) {
-										return (
-											<div style={{ 
-												marginBottom: '1.25rem', 
-												padding: '0.85rem 1rem', 
-												borderRadius: 'var(--radius-md, 8px)', 
-												background: 'var(--color-success-subtle)', 
-												border: '1px solid var(--color-success-border)', 
-												color: 'var(--color-success)',
-												fontSize: '0.825rem',
-												textAlign: 'left'
-											}}>
-												<strong style={{ display: 'block', marginBottom: '0.45rem', color: 'var(--color-success)', fontSize: '0.85rem' }}>⚡ 接口相关变更文件：</strong>
-												<div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontFamily: 'var(--font-family-mono)', fontSize: '0.76rem' }}>
-													{files.map((f: string, idx: number) => (
-														<div key={idx} style={{ paddingLeft: '0.5rem', borderLeft: '2px solid var(--color-success)' }}>{f}</div>
-													))}
-												</div>
-											</div>
-										);
-									}
-								} catch(e) {}
-								return null;
-							})()}
-							<pre style={{ margin: 0, color: 'var(--color-info)', fontSize: '0.8rem', fontFamily: "var(--font-family-mono)", textAlign: 'left', lineHeight: 1.4 }}>
-								<code>{formatPayload(viewingEvent.payload)}</code>
-							</pre>
-						</div>
+			<Modal
+				open={viewingEvent !== null}
+				title="原始 Webhook JSON Payload"
+				subtitle={viewingEvent ? `事件ID: ${viewingEvent.id} | MR序号: #${viewingEvent.mr_num}` : undefined}
+				onClose={() => setViewingEvent(null)}
+				width="lg"
+				footer={
+					<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+						<button type="button" onClick={() => setViewingEvent(null)} className="btn btn-secondary">
+							关闭
+						</button>
 					</div>
-				</div>
-			)}
+				}
+			>
+				{viewingEvent && (
+					<div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+						{viewingEvent.is_proto_change && viewingEvent.interface_files && (() => {
+							try {
+								const files = JSON.parse(viewingEvent.interface_files);
+								if (files && files.length > 0) {
+									return (
+										<div style={{ 
+											padding: '0.85rem 1rem', 
+											borderRadius: 'var(--radius-md, 8px)', 
+											background: 'var(--color-success-subtle)', 
+											border: '1px solid var(--color-success-border)', 
+											color: 'var(--color-success)',
+											fontSize: '0.825rem',
+											textAlign: 'left'
+										}}>
+											<strong style={{ display: 'block', marginBottom: '0.45rem', fontSize: '0.85rem' }}>⚡ 接口相关变更文件：</strong>
+											<div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontFamily: 'var(--font-family-mono)', fontSize: '0.76rem' }}>
+												{files.map((f: string, idx: number) => (
+													<div key={idx} style={{ paddingLeft: '0.5rem', borderLeft: '2px solid var(--color-success)' }}>{f}</div>
+												))}
+											</div>
+										</div>
+									);
+								}
+							} catch(e) {}
+							return null;
+						})()}
+						<pre style={{ margin: 0, padding: '1rem', borderRadius: 'var(--radius-sm, 6px)', background: 'var(--color-bg-input)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-info)', fontSize: '0.8rem', fontFamily: "var(--font-family-mono)", textAlign: 'left', lineHeight: 1.4, maxHeight: '50vh', overflowY: 'auto' }}>
+							<code>{formatPayload(viewingEvent.payload)}</code>
+						</pre>
+					</div>
+				)}
+			</Modal>
 		</div>
 	);
 }

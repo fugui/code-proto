@@ -10,7 +10,7 @@ COMMON_SRCS     := $(shell find $(COMMON_DIR) -type f 2>/dev/null)
 FRONTEND_SRCS   := $(shell find $(FRONTEND_DIR) -type f -not -path "*/node_modules/*" -not -path "*/dist/*" 2>/dev/null) $(COMMON_SRCS)
 BACKEND_SRCS    := $(shell find . -type f \( -name "*.go" -o -name "go.mod" -o -name "go.sum" \) -not -path "*/$(FRONTEND_DIR)/*" -not -path "*/.git/*")
 
-.PHONY: all build install frontend backend clean run
+.PHONY: all build install frontend backend clean run test
 
 # 默认运行目标
 all: build
@@ -42,6 +42,10 @@ $(BINARY): $(BACKEND_SRCS) $(DIST_DIR)
 # 清理构建产物
 clean:
 	rm -rf $(DIST_DIR) $(BINARY)
+
+# 运行单元测试
+test:
+	go test ./...
 
 # 快捷启动命令
 run: build
